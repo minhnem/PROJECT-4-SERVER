@@ -48,8 +48,6 @@ const login = async (req: any, res: any) => {
     const body = req.body
     const {email} = body
     try {
-        console.log(body);
-
         const user: any = await UserModel.findOne({email})
         if(!user) {
             throw new Error("Tài khoản không tồn tại.")
@@ -111,7 +109,7 @@ const loginWithGoogle = async (req: any, res: any) => {
             delete newUser._doc.password
     
             res.status(200).json({
-                message: "Đăng ký thành công.",
+                message: "Nhập ký thành công.",
                 data: {
                     ...newUser._doc, 
                     token: await getAccesstoken({
@@ -130,4 +128,30 @@ const loginWithGoogle = async (req: any, res: any) => {
     }
 }
 
-export { register, login, loginWithGoogle }
+const refreshToken = async (req: any, res: any) => {
+    const { id }= req.query
+    try {
+        const user =  await UserModel.findById(id)
+        if(!user) {
+            throw new Error("User not found")
+        }
+
+        const token = await getAccesstoken({
+            _id: id,
+            email: user.email as string,
+            rule: user.rule
+        })
+
+        res.status(200).json({
+            message: "refresh successfully",
+            data: token
+        })
+    } catch (error: any) {
+        res.status(404).json({
+            message: error.message
+        })
+    }
+    
+}
+
+export { register, login, loginWithGoogle, refreshToken }
