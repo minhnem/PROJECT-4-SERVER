@@ -109,7 +109,7 @@ const loginWithGoogle = async (req: any, res: any) => {
             delete newUser._doc.password
     
             res.status(200).json({
-                message: "Nhập ký thành công.",
+                message: "Đăng ký thành công.",
                 data: {
                     ...newUser._doc, 
                     token: await getAccesstoken({
@@ -133,7 +133,7 @@ const refreshToken = async (req: any, res: any) => {
     try {
         const user =  await UserModel.findById(id)
         if(!user) {
-            throw new Error("User not found")
+            throw new Error("Người dùng không tồn tại.")
         }
 
         const token = await getAccesstoken({
@@ -143,7 +143,7 @@ const refreshToken = async (req: any, res: any) => {
         })
 
         res.status(200).json({
-            message: "refresh successfully",
+            message: "refresh thành công.",
             data: token
         })
     } catch (error: any) {

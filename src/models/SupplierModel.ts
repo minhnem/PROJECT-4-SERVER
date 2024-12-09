@@ -12,6 +12,7 @@ const SupplierSchema = new Schema({
     },
     price: Number,
     contact: String,
+    email: String,
     isTaking: {
         type: Number,
         default: 0,
