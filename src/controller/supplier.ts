@@ -22,9 +22,13 @@ const getSuppliers = async (req: any, res: any) => {
     try {
         const skip = (page - 1) * pageSize
         const suppliers = await SupplierModel.find({}).skip(skip).limit(pageSize)
+        const total = await SupplierModel.countDocuments()
         res.status(200).json({
             message: 'Danh sách nhà cung cấp.',
-            data: suppliers
+            data: {
+                suppliers,
+                total
+            }
         })
     } catch (error: any) {
         res.status(404).json({

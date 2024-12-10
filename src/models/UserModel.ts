@@ -16,6 +16,8 @@ const UserSchema = new Schema({
         require: true
     },
 
+    photoUrl: String,
+
     rule: {
         type: Number,
         default: 1
