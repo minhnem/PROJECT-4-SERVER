@@ -4,7 +4,7 @@ const addNew = async (req: any, res: any) => {
     const body = req.body
     try {
         const newSupplier = new SupplierModel(body)
-        newSupplier.save()
+        await newSupplier.save()
         
         res.status(200).json({
             message: 'Thêm mới nhà cung cấp thành công.',
@@ -71,7 +71,6 @@ const getSuppliers = async (req: any, res: any) => {
 const getDatas =  async (req: any, res: any) => {
     const body = req.body
     const {start, end} = req.query
-    console.log(body);
     
     try {
         const filter: any = {}

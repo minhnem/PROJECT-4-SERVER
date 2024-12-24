@@ -4,8 +4,10 @@ import mongoose from "mongoose"
 import userRouter from "./src/router/user"
 import storegeRouter from "./src/router/storege"
 import supplierRouter from "./src/router/supplier"
+import productRouter from "./src/router/productRouter"
 import cors from "cors"
 import { verifyToken } from "./src/middlewares/verifyToken"
+
 dotenv.config()
 
 const PORT = process.env.PORT
@@ -19,6 +21,7 @@ app.use("/auth", userRouter)
 app.use(verifyToken)
 app.use("/storege", storegeRouter)
 app.use("/supplier", supplierRouter)
+app.use("/product", productRouter)
 
 const connectDB = async () => {
     try {
