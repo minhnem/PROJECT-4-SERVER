@@ -17,6 +17,10 @@ const schema = new Schema({
     updatedAt: {
         type: Date,
         default: Date.now,
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false
     }
 })
 
