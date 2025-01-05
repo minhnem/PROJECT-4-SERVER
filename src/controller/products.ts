@@ -1,3 +1,4 @@
+import { log } from "console"
 import CategoryModel from "../models/CategoryModel"
 import ProductModel from "../models/ProductModel"
 import SupplierModel from "../models/SupplierModel"
@@ -107,4 +108,21 @@ const deleteCategories = async (req: any, res: any) => {
     }
 }
 
-export {getProducts, addCategory, getCategories, deleteCategories}
+const updateCategory = async (req: any, res: any) => {
+    const body = req.body
+    const {id} = req.query
+    try {
+        
+        await CategoryModel.findByIdAndUpdate(id, body)
+        res.status(200).json({
+            message: 'Sửa danh mục thành công',
+            data: []
+        })
+    } catch (error: any) {
+        res.status(404).json({
+            message: error.message
+        })
+    }
+}
+
+export {getProducts, addCategory, getCategories, deleteCategories, updateCategory}

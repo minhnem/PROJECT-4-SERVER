@@ -94,7 +94,7 @@ const getDatas =  async (req: any, res: any) => {
         
         res.status(200).json({
             message: 'Lấy dữ liệu thành công',
-            data: items
+            data: items.length > 0 ? items : suppliers
         })
     } catch (error: any) {
         res.status(404).json({
