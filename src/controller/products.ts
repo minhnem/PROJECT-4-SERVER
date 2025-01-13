@@ -1,13 +1,21 @@
-import { log } from "console"
 import CategoryModel from "../models/CategoryModel"
 import ProductModel from "../models/ProductModel"
 import SupplierModel from "../models/SupplierModel"
+import SubProductModel from "../models/SubProductModel"
 
+//Product
 const getProducts = async (req: any, res: any) => {
+    const {page, pageSize} = req.query
     try {
+        const skip = (page - 1) * pageSize
+        const products = await ProductModel.find({isDeleted: false}).skip(skip).limit(pageSize)
+        const total = await ProductModel.countDocuments()
         res.status(200).json({
             message: "Products",
-            data: []
+            data: {
+                products,
+                total
+            }
         })
     } catch (error: any) {
         res.status(404).json({
@@ -16,6 +24,26 @@ const getProducts = async (req: any, res: any) => {
     }
 }
 
+const addProduct = async (req: any, res: any) => {
+    const body = req.body
+    try {
+        const product = new ProductModel(body)
+        await product.save()
+        
+        res.status(200).json({
+            message: 'Thêm sản phẩm thành công',
+            data: product
+        })
+    } catch (error: any) {
+        res.status(404).json({
+            message: error.message
+        })
+    }
+}
+
+
+
+// Category
 const addCategory = async (req: any, res: any) => {
     const body = req.body
     const {parentId, slug} = body
@@ -55,6 +83,21 @@ const getCategories = async (req: any, res: any) => {
                 categories,
                 total
             }
+        })
+    } catch (error: any) {
+        res.status(404).json({
+            message: error.message
+        })
+    }
+}
+
+const getCategoryDetail = async (req: any, res: any) => {
+    const {id} = req.query
+    try {
+        const category = await CategoryModel.findById(id)
+        res.status(200).json({
+            message: 'Lấy danh mục thành công.',
+            data: category
         })
     } catch (error: any) {
         res.status(404).json({
@@ -125,4 +168,22 @@ const updateCategory = async (req: any, res: any) => {
     }
 }
 
-export {getProducts, addCategory, getCategories, deleteCategories, updateCategory}
+
+//SubProduct
+const addSubProduct = async (req: any, res: any) => {
+    const body = req.body
+    try {
+        const subProduct = new SubProductModel(body)
+        await subProduct.save()
+        res.status(200).json({
+            message: 'Thêm biến thể sản phẩm thành công.',
+            data: subProduct
+        })
+    } catch (error:any) {
+        res.status(404).json({
+            message: error.message
+        })
+    }
+}
+
+export {addCategory, getCategories, getCategoryDetail, deleteCategories, updateCategory, getProducts, addProduct, addSubProduct}

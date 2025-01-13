@@ -3,7 +3,7 @@ import mongoose, { Schema } from "mongoose";
 const SupplierSchema = new Schema({
     name: {
         type: String,
-        require: true
+        required: true
     },
     slug: String,
     product: String,

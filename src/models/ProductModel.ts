@@ -3,17 +3,20 @@ import mongoose, { Schema } from "mongoose";
 const schema = new Schema({
     title: {
         type: String,
-        require: true
+        required: true
     },
     slug: String,
     description: String,
     categories: [String],
     supplier: {
         type: String, 
-        require: true
+        required: true
     },
     expiryDate: {
         type: Date
+    },
+    images: {
+        type: [String]
     },
     createdAt: {
         type: Date,
@@ -22,7 +25,12 @@ const schema = new Schema({
     updatedAt: {
         type: Date,
         default: Date.now()
-    } 
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false
+    }
+
 })
 
 const ProductModel = mongoose.model('products', schema)

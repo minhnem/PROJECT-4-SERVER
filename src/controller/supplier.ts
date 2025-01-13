@@ -68,6 +68,21 @@ const getSuppliers = async (req: any, res: any) => {
     }
 }
 
+const getSupplierDetail = async (req: any, res: any) => {
+    const {id} = req.query
+    try {
+        const supplier = await SupplierModel.findById(id)
+        res.status(200).json({
+            message: 'Danh sách nhà cung cấp.',
+            data: supplier
+        })
+    } catch (error: any) {
+        res.status(404).json({
+            message: error.message
+        })
+    }
+}
+
 const getDatas =  async (req: any, res: any) => {
     const body = req.body
     const {start, end} = req.query
@@ -155,4 +170,4 @@ const getForm = async (req: any, res: any)=> {
     }
 }
 
-export {addNew, getSuppliers, updateSupplier, deleteSupplier, getForm, getDatas}
+export {addNew, getSuppliers, updateSupplier, deleteSupplier, getForm, getDatas, getSupplierDetail}

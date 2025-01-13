@@ -3,7 +3,7 @@ import mongoose, { Schema } from "mongoose";
 const schema = new Schema({
     title: {
         type: String,
-        require: true,
+        required: true,
     },
     parentId: String,
     slug: {
