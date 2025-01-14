@@ -8,15 +8,21 @@ const getProducts = async (req: any, res: any) => {
     const {page, pageSize} = req.query
     try {
         const skip = (page - 1) * pageSize
-        const products = await ProductModel.find({isDeleted: false}).skip(skip).limit(pageSize)
+        const items = await ProductModel.find({isDeleted: false}).skip(skip).limit(pageSize).lean()
         const total = await ProductModel.countDocuments()
+        const products: any[] = []  
+        for (const item of items) {
+            const subProducts = await SubProductModel.find({ productId: item._id, isDeleted: false });
+            const product = { ...item, subProduct: subProducts };
+            products.push(product);
+        }
         res.status(200).json({
-            message: "Products",
+            message: 'Products',
             data: {
                 products,
-                total
-            }
-        })
+                total,
+            },
+        });
     } catch (error: any) {
         res.status(404).json({
             message: error.message
@@ -37,6 +43,29 @@ const addProduct = async (req: any, res: any) => {
     } catch (error: any) {
         res.status(404).json({
             message: error.message
+        })
+    }
+}
+
+const handleDeleteSubProductInProduct = async (id: string) => {
+    await SubProductModel.findByIdAndUpdate(id, {isDeleted: true})
+}
+
+const deleteProduct = async (req: any, res: any) => {
+    const {id} = req.query
+    try {
+        const subProducts = await SubProductModel.find({productId: id})
+        if(subProducts.length > 0) {
+            subProducts.forEach((item: any) => handleDeleteSubProductInProduct(item._id))
+        }
+        await ProductModel.findByIdAndUpdate(id, {isDeleted: true})
+        res.status(200).json({
+            message: 'Xóa sản phẩm thành công.',
+            data: []
+        })
+    } catch (error: any) {
+        res.status(404).json({
+            message: error.message 
         })
     }
 }
@@ -135,7 +164,7 @@ const deleteCategories = async (req: any, res: any) => {
         await findAndDeleteCategoryInProduct(id)
         
         if (isDeleted) {
-            await CategoryModel.findByIdAndUpdate(id, {isDeleted: false})
+            await CategoryModel.findByIdAndUpdate(id, {isDeleted: true})
         } else {
             await CategoryModel.findByIdAndDelete(id)
         }
@@ -186,4 +215,4 @@ const addSubProduct = async (req: any, res: any) => {
     }
 }
 
-export {addCategory, getCategories, getCategoryDetail, deleteCategories, updateCategory, getProducts, addProduct, addSubProduct}
+export {addCategory, getCategories, getCategoryDetail, deleteCategories, updateCategory, getProducts, addProduct, addSubProduct, deleteProduct}
