@@ -30,15 +30,37 @@ const getProducts = async (req: any, res: any) => {
     }
 }
 
+const getProductDetail = async (req: any, res: any) => {
+    const {id} = req.query
+    try {
+        const product = await ProductModel.findById(id)
+        res.status(200).json({
+            message: 'Lấy sản phẩm theo id thành công',
+            data: product
+        })
+    } catch (error: any) {
+       res.status(404).json({
+        message: error.message
+       }) 
+    }
+}
+
 const addProduct = async (req: any, res: any) => {
     const body = req.body
     try {
-        const product = new ProductModel(body)
-        await product.save()
+
+        const item = await ProductModel.findOne({slug: body.slug})
+
+        if(item) {
+            throw new Error('Sản phẩm này đã tồn tại.')
+        }
+
+        const newProduct = new ProductModel(body)
+        await newProduct.save()
         
         res.status(200).json({
             message: 'Thêm sản phẩm thành công',
-            data: product
+            data: newProduct
         })
     } catch (error: any) {
         res.status(404).json({
@@ -70,6 +92,21 @@ const deleteProduct = async (req: any, res: any) => {
     }
 }
 
+const updateProduct = async (req: any, res: any) => {
+    const body = req.body
+    const {id} = req.query
+    try {
+        const product = await ProductModel.findByIdAndUpdate(id, body)
+        res.status(200).json({
+            message: 'Sửa sản phẩm thành công.',
+            data: product
+        })
+    } catch (error: any) {
+        res.status(404).json({
+            message: error.message 
+        })
+    }
+}
 
 
 // Category
@@ -215,4 +252,16 @@ const addSubProduct = async (req: any, res: any) => {
     }
 }
 
-export {addCategory, getCategories, getCategoryDetail, deleteCategories, updateCategory, getProducts, addProduct, addSubProduct, deleteProduct}
+export {
+    addCategory, 
+    getCategories, 
+    getCategoryDetail, 
+    deleteCategories, 
+    updateCategory, 
+    getProducts, 
+    addProduct, 
+    addSubProduct, 
+    deleteProduct,
+    getProductDetail,
+    updateProduct,
+}
