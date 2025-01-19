@@ -5,11 +5,17 @@ import SubProductModel from "../models/SubProductModel"
 
 //Product
 const getProducts = async (req: any, res: any) => {
-    const {page, pageSize} = req.query
+    const {title, page, pageSize} = req.query
+    const filter: any = {}
+    if(title) {
+        filter.slug = {$regex: title}
+    }
+    filter.isDeleted = false
     try {
         const skip = (page - 1) * pageSize
-        const items = await ProductModel.find({isDeleted: false}).skip(skip).limit(pageSize).lean()
-        const total = await ProductModel.countDocuments()
+        const items = await ProductModel.find(filter).skip(skip).limit(pageSize).lean()
+        const totalProduct = await ProductModel.find({isDeleted: false})
+        const total = totalProduct.length
         const products: any[] = []  
         for (const item of items) {
             const subProducts = await SubProductModel.find({ productId: item._id, isDeleted: false });
