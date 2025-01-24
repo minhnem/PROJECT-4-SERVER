@@ -163,6 +163,20 @@ const getCategories = async (req: any, res: any) => {
     }
 }
 
+const getAllCategories = async (req: any, res: any) => {
+    try {
+        const categories = await CategoryModel.find({$or: [{isDeleted: false}, {isDeleted: null}]})
+        res.status(200).json({
+            message: 'Lấy danh mục thành công.',
+            data: categories,
+        })
+    } catch (error: any) {
+        res.status(404).json({
+            message: error.message
+        })
+    }
+}
+
 const getCategoryDetail = async (req: any, res: any) => {
     const {id} = req.query
     try {
@@ -258,9 +272,86 @@ const addSubProduct = async (req: any, res: any) => {
     }
 }
 
+const getFilterSubProducts = async (req: any, res: any) => {
+    const subProducts: any = {}
+    const colors: object[] = []
+    const sizes: object[] = []
+    const price: number[] = []
+    try {
+        const items = await SubProductModel.find({isDeleted: false})
+        items.forEach((item: any) => {
+            if(!colors.some((element: any) => element.label === item.color)){
+                colors.push({label: item.color, value: item.color})
+            }
+            if(!sizes.some((element: any) => element.label === item.size)){
+                sizes.push({label: item.size, value: item.size})
+            }
+            price.push(item.price)
+        })
+
+        subProducts.colors = colors
+        subProducts.sizes = sizes
+        subProducts.price = [Math.min(...price), Math.max(...price)]
+
+        res.status(200).json({
+            message: 'Lấy biến thể thành công.',
+            data: subProducts
+        })
+    } catch (error: any) {
+        res.status(404).json({
+            message: error.message
+        })
+    }
+}
+
+const filterProduct = async (req: any, res: any) => {
+    const body = req.body
+    const {categories, color, size, price} = body
+    try {
+        const filter: any = {}
+        if(color) {
+            filter.color = color
+        } 
+        if(size) {
+            filter.size = size
+        } 
+        if(price && price.length > 0) {
+            filter.price = {$gte: price[0], $lte: price[1]}
+        }
+        filter.isDeleted = false
+        const subProduct = await SubProductModel.find(filter)
+        const product: any[] = []
+        if(subProduct.length > 0) {
+            for(const sub of subProduct){
+                const perent = await ProductModel.findOne({$and: [{_id: sub.productId}, {categories: categories}]})
+                product.push(perent)
+            }
+        }
+        const items: any[] = [] 
+        if(product.length > 0) {
+            product.forEach((item: any) => {
+                const childrent = subProduct.filter((sub) => sub.productId === item._id.toString())
+                items.push({...item._doc, subProduct: childrent})
+            })
+        }
+        res.status(200).json({
+            message: 'Lọc sản phẩm thành công.',
+            data: {
+                items,
+                total: items.length
+            }
+        })
+    } catch (error: any) {
+        res.status(404).json({
+            message: error.message
+        })
+    }
+}
+
 export {
     addCategory, 
-    getCategories, 
+    getCategories,
+    getAllCategories, 
     getCategoryDetail, 
     deleteCategories, 
     updateCategory, 
@@ -270,4 +361,6 @@ export {
     deleteProduct,
     getProductDetail,
     updateProduct,
+    getFilterSubProducts,
+    filterProduct,
 }
