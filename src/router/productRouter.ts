@@ -13,7 +13,10 @@ import {
     getFilterSubProducts, 
     updateCategory, 
     updateProduct, 
-    filterProduct
+    filterProduct,
+    getSubProductById,
+    updateSubProduct,
+    deleteSubProduct
 } from "../controller/products";
 
 const router = Router()
@@ -30,6 +33,9 @@ router.post('/filter-product', filterProduct)
 // SubProduct
 router.post('/add-sub-product', addSubProduct)
 router.get('/get-sub-product', getFilterSubProducts)
+router.get('/get-sub-product-detail', getSubProductById)
+router.put('/update-sub-product', updateSubProduct)
+router.delete('/delete-sub-product', deleteSubProduct)
 
 // Category
 router.get('/get-all-categories', getAllCategories)

@@ -114,6 +114,50 @@ const updateProduct = async (req: any, res: any) => {
     }
 }
 
+const filterProduct = async (req: any, res: any) => {
+    const body = req.body
+    const {categories, color, size, price} = body
+    try {
+        const filter: any = {}
+        if(color) {
+            filter.color = color
+        } 
+        if(size) {
+            filter.size = size
+        } 
+        if(price && price.length > 0) {
+            filter.price = {$gte: price[0], $lte: price[1]}
+        }
+        filter.isDeleted = false
+        const subProduct = await SubProductModel.find(filter)
+        const product: any[] = []
+        if(subProduct.length > 0) {
+            for(const sub of subProduct){
+                const perent = await ProductModel.findOne({$and: [{_id: sub.productId}, {categories: categories}]})
+                product.push(perent)
+            }
+        }
+        const items: any[] = [] 
+        if(product.length > 0) {
+            product.forEach((item: any) => {
+                const childrent = subProduct.filter((sub) => sub.productId === item._id.toString())
+                items.push({...item._doc, subProduct: childrent})
+            })
+        }
+        res.status(200).json({
+            message: 'Lọc sản phẩm thành công.',
+            data: {
+                items,
+                total: items.length
+            }
+        })
+    } catch (error: any) {
+        res.status(404).json({
+            message: error.message
+        })
+    }
+}
+
 
 // Category
 const addCategory = async (req: any, res: any) => {
@@ -272,6 +316,21 @@ const addSubProduct = async (req: any, res: any) => {
     }
 }
 
+const getSubProductById = async (req: any, res: any) => {
+    const {id} = req.query
+    try {
+        const subProduct = await SubProductModel.find({productId: id})
+        res.status(200).json({
+            message: 'Lấy biển thể sản phẩm theo id thành công.',
+            data: subProduct
+        })
+    } catch (error: any) {
+        res.status(404).json({
+            message: error.message
+        })
+    }
+}
+
 const getFilterSubProducts = async (req: any, res: any) => {
     const subProducts: any = {}
     const colors: object[] = []
@@ -304,42 +363,29 @@ const getFilterSubProducts = async (req: any, res: any) => {
     }
 }
 
-const filterProduct = async (req: any, res: any) => {
+const updateSubProduct = async (req: any, res: any) => {
     const body = req.body
-    const {categories, color, size, price} = body
+    const {id} = req.query
     try {
-        const filter: any = {}
-        if(color) {
-            filter.color = color
-        } 
-        if(size) {
-            filter.size = size
-        } 
-        if(price && price.length > 0) {
-            filter.price = {$gte: price[0], $lte: price[1]}
-        }
-        filter.isDeleted = false
-        const subProduct = await SubProductModel.find(filter)
-        const product: any[] = []
-        if(subProduct.length > 0) {
-            for(const sub of subProduct){
-                const perent = await ProductModel.findOne({$and: [{_id: sub.productId}, {categories: categories}]})
-                product.push(perent)
-            }
-        }
-        const items: any[] = [] 
-        if(product.length > 0) {
-            product.forEach((item: any) => {
-                const childrent = subProduct.filter((sub) => sub.productId === item._id.toString())
-                items.push({...item._doc, subProduct: childrent})
-            })
-        }
+        const subProduct = await SubProductModel.findByIdAndUpdate(id, body)
         res.status(200).json({
-            message: 'Lọc sản phẩm thành công.',
-            data: {
-                items,
-                total: items.length
-            }
+            message: 'Sửa biến thể thành công.',
+            data: subProduct
+        })
+    } catch (error: any) {
+        res.status(404).json({
+            message: error.message
+        })
+    }
+}
+
+const deleteSubProduct = async (req: any, res: any) => {
+    const {id} = req.query
+    try {
+        await SubProductModel.findByIdAndDelete(id)
+        res.status(200).json({
+            message: 'Xóa biến thể thành công.',
+            data: []
         })
     } catch (error: any) {
         res.status(404).json({
@@ -363,4 +409,7 @@ export {
     updateProduct,
     getFilterSubProducts,
     filterProduct,
+    getSubProductById,
+    updateSubProduct,
+    deleteSubProduct,
 }
