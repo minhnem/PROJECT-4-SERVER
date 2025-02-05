@@ -7,6 +7,7 @@ const schema = new Schema({
     },
     slug: String,
     description: String,
+    content: String,
     categories: [String],
     supplier: {
         type: String, 
