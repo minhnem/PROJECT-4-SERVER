@@ -7,6 +7,7 @@ import supplierRouter from "./src/router/supplier"
 import productRouter from "./src/router/productRouter"
 import cors from "cors"
 import { verifyToken } from "./src/middlewares/verifyToken"
+import customerRouter from "./src/router/customerRouter"
 
 dotenv.config()
 
@@ -17,6 +18,7 @@ const app = express()
 app.use(express.json())
 app.use(cors())
 app.use("/auth", userRouter)
+app.use("/customer", customerRouter)
 
 app.use(verifyToken)
 app.use("/storege", storegeRouter)

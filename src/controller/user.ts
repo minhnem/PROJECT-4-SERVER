@@ -9,7 +9,6 @@ const register = async (req: any, res: any) => {
     const body = req.body
     const {email, password} = body
     try {
-        console.log(body);
 
         const user = await UserModel.findOne({email})
         if(user) {
