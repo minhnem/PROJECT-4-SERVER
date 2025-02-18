@@ -133,7 +133,12 @@ const filterProduct = async (req: any, res: any) => {
         const product: any[] = []
         if(subProduct.length > 0) {
             for(const sub of subProduct){
-                const perent = await ProductModel.findOne({$and: [{_id: sub.productId}, {categories: categories}]})
+                const filterParent: any = {}
+                filterParent._id = sub.productId
+                if(categories && categories.length > 0) {
+                    filterParent.categories = {$in: categories}
+                }
+                const perent = await ProductModel.findOne(filterParent)
                 product.push(perent)
             }
         }

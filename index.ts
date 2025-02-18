@@ -17,13 +17,14 @@ const app = express()
 
 app.use(express.json())
 app.use(cors())
+
 app.use("/auth", userRouter)
 app.use("/customer", customerRouter)
+app.use("/product", productRouter)
 
 app.use(verifyToken)
 app.use("/storege", storegeRouter)
 app.use("/supplier", supplierRouter)
-app.use("/product", productRouter)
 
 const connectDB = async () => {
     try {
