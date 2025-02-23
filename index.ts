@@ -8,6 +8,7 @@ import productRouter from "./src/router/productRouter"
 import cors from "cors"
 import { verifyToken } from "./src/middlewares/verifyToken"
 import customerRouter from "./src/router/customerRouter"
+import promotionRouter from "./src/router/promotionRouter"
 
 dotenv.config()
 
@@ -21,6 +22,7 @@ app.use(cors())
 app.use("/auth", userRouter)
 app.use("/customer", customerRouter)
 app.use("/product", productRouter)
+app.use("/promotion", promotionRouter)
 
 app.use(verifyToken)
 app.use("/storege", storegeRouter)
